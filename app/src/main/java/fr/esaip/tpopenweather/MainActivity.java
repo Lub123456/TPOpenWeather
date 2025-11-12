@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +47,12 @@ public class MainActivity extends AppCompatActivity {
         TextView humidity = binding.idHumidite;
         TextView direction_vent = binding.idDirectionVent;
 
-        // Activity is a LifecycleOwner, use `this` instead of `viewLifecycleOwner` (that's for Fragments)
+        ImageView iconView = binding.imageView;
+
+        OpenWeather.weatherIcon().observe(this , bitmap -> {
+            iconView.setImageBitmap(bitmap);
+        });
+
         OpenWeather.weatherData().observe(this, weatherData -> {
             try {
                 JSONObject coord = weatherData.getJSONObject("coord");
@@ -64,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
                 pressure.setText("" + main.getInt("pressure"));
                 humidity.setText("" + main.getInt("humidity"));
                 direction_vent.setText("" + wind.getInt("deg"));
+
+                String iconCode = weather.getString("icon");
+                OpenWeather.updateIcon(this, iconCode);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Erreur lors de la récupération des données météo", Toast.LENGTH_LONG).show();
